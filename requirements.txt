@@ -8,3 +8,5 @@ pydantic[email]~=2.4.2
 passlib[bcrypt]
 elasticsearch~=8.14.0
 elasticsearchquerygenerator~=5.0.0
+openai~=1.35.7
+tiktoken~=0.5.1
