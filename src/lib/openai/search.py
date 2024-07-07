@@ -14,11 +14,6 @@ set_base = "cl100k_base"
 EMBEDDING_MODEL = "text-embedding-3-large"
 
 
-class Item():
-    id: int
-    title: str
-
-
 def num_tokens_from_string(string: str, encoding_name: str) -> int:
     """Returns the number of tokens in a text string."""
     encoding = tiktoken.get_encoding(encoding_name)

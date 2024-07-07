@@ -6,7 +6,7 @@ from src.database.session import get_db
 import src.database.repository.setting as setting_repository
 import src.helpers.response as response
 
-import src.lib.openai.search as search
+import src.lib.llama.search as search
 
 router = APIRouter()
 
