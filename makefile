@@ -18,6 +18,10 @@ else
 endif
 
 # Set of commands to start-app
+install:
+	@echo "Installing packages..."
+	pip install -r requirements.txt
+
 start-app:
 	@echo "Starting app..."
 	uvicorn main:app --reload
@@ -28,5 +32,6 @@ help:
 	@echo "  make run-migrations    - Run all migrations up to the latest"
 	@echo "  make undo-migration    - Revert the latest migration"
 	@echo "  make create-migration  - Create a new migration"
+	@echo "  make install           - Install packages"
 	@echo "  make start-app         - Start the FastAPI app"
 	@echo "  make help              - Display this help message"

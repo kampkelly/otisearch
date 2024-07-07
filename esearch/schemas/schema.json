@@ -1,0 +1,51 @@
+[
+    {
+        "database": "be2_test",
+        "index": "be2_test_contact_ggikz_index",
+        "plugins": [
+            "Fullname",
+            "Description"
+        ],
+        "mapping": {
+            "description_vector": {
+                "type": "dense_vector",
+                "dims": 1024,
+                "index": "true",
+                "similarity": "cosine"
+            }
+        },
+        "nodes": {
+            "table": "contact",
+            "schema": "public",
+            "columns": [
+                "firstName",
+                "lastName",
+                "email",
+                "gender",
+                "phone",
+                "citizenship",
+                "address"
+            ],
+            "transform": {
+                "rename": {
+                    "phone": "mobile"
+                }
+            },
+            "children": [
+                {
+                    "table": "document",
+                    "columns": [
+                        "id",
+                        "type",
+                        "s3Key",
+                        "fileName"
+                    ],
+                    "relationship": {
+                        "variant": "object",
+                        "type": "one_to_many"
+                    }
+                }
+            ]
+        }
+    }
+]
