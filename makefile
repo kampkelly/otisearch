@@ -1,6 +1,11 @@
 # Makefile for Bettersearch
 
 # Set of commands to manage migrations
+activate-env:
+	@echo "activating env..."
+	conda activate ./venv
+
+# Set of commands to manage migrations
 run-migrations:
 	@echo "Running migrations..."
 	alembic upgrade head
@@ -18,9 +23,14 @@ else
 endif
 
 # Set of commands to start-app
-install:
+install-old:
 	@echo "Installing packages..."
 	pip install -r requirements.txt
+
+# Set of commands to start-app
+install:
+	@echo "Installing packages..."
+	pip-compile requirements.in && pip-sync requirements.txt
 
 start-app:
 	@echo "Starting app..."

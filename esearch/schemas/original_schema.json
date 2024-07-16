@@ -1,0 +1,37 @@
+[
+    {
+        "database": "be2_test",
+        "index": "bettersearch_poc",
+        "plugins": [
+            "Fullname",
+            "Description"
+        ],
+        "mapping": {
+            "description_vector": {
+                "type": "dense_vector",
+                "dims": 1024,
+                "index": "true",
+                "similarity": "cosine"
+            }
+        },
+        "nodes": {
+            "table": "contact",
+            "schema": "public",
+            "columns": [
+                "firstName",
+                "lastName",
+                "email",
+                "gender",
+                "phone",
+                "citizenship",
+                "address"
+            ],
+            "transform": {
+                "rename": {
+                    "phone": "mobile"
+                }
+            },
+            "children": []
+        }
+    }
+]

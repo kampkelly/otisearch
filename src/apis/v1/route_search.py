@@ -20,6 +20,7 @@ class SchemaInput(BaseModel):
 class SimilaritiesInput(BaseModel):
     text: str
     email: EmailStr
+    llm_check: bool = False
 
 
 @router.get("/word")
@@ -33,5 +34,5 @@ def similarities(body: SimilaritiesInput, db: Session = Depends(get_db)):
     existing_setting = setting_repository.get_setting_by_email(body.email, db)
     if not existing_setting:
         return response.error_response('setting does not exist', 404)
-    result = search.similarities(body.text, existing_setting)
+    result = search.similarities_with_voyage(body.text, existing_setting, body.llm_check)
     return result

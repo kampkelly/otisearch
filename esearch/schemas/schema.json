@@ -1,9 +1,8 @@
 [
     {
-        "database": "be2_test",
-        "index": "be2_test_contact_ggikz_index",
+        "database": "bettersearch_sample",
+        "index": "phones",
         "plugins": [
-            "Fullname",
             "Description"
         ],
         "mapping": {
@@ -15,37 +14,16 @@
             }
         },
         "nodes": {
-            "table": "contact",
+            "table": "phones",
             "schema": "public",
             "columns": [
-                "firstName",
-                "lastName",
-                "email",
-                "gender",
-                "phone",
-                "citizenship",
-                "address"
+                "name",
+                "type",
+                "info",
+                "manufacturer",
+                "releaseDate"
             ],
-            "transform": {
-                "rename": {
-                    "phone": "mobile"
-                }
-            },
-            "children": [
-                {
-                    "table": "document",
-                    "columns": [
-                        "id",
-                        "type",
-                        "s3Key",
-                        "fileName"
-                    ],
-                    "relationship": {
-                        "variant": "object",
-                        "type": "one_to_many"
-                    }
-                }
-            ]
+            "children": []
         }
     }
 ]
