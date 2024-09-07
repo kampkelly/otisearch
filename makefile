@@ -17,8 +17,10 @@ undo-migration:
 create-migration:
 	@echo "Creating migrations..."
 ifdef MANUAL
+	@echo "Manual migrations..."
 	alembic revision -m "$(MSG)"
 else
+	@echo "Autogenerate migrations... $(MSG)"
 	alembic revision --autogenerate -m "$(MSG)"
 endif
 
