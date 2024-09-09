@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from fastapi import Depends
 from pydantic import BaseModel
 
-from src.database.schemas.setting import SettingCreate, ShowSetting
+from src.database.schemas.setting_schema import SettingCreate, ShowSetting
 from src.database.session import get_db
 from src.utils import create_schema_json
 from src.helpers.response import success_response

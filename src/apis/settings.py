@@ -2,7 +2,7 @@ from esearch.index import ESearch
 import psycopg2
 from sqlalchemy.orm import Session
 
-from src.database.schemas.setting import SettingCreate, ShowSetting
+from src.database.schemas.setting_schema import SettingCreate, ShowSetting
 import src.database.repository.setting as setting_repository
 from src.utils import create_schema_json
 from src.utils.index import generate_secret_key, generate_index_name

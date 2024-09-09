@@ -33,6 +33,6 @@ def start_application():
 
 app = start_application()
 
-@app.get("/")
+@app.get("/healthz")
 def read_root():
     return {"message": "success"}

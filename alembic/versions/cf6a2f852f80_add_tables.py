@@ -26,6 +26,7 @@ def upgrade() -> None:
     sa.Column('company_name', sa.String(), nullable=True),
     sa.Column('first_name', sa.String(), nullable=True),
     sa.Column('last_name', sa.String(), nullable=True),
+    sa.Column('password', sa.String(), nullable=False),
     sa.Column('purpose', sa.String(), nullable=True),
     sa.Column('cancel_reason', sa.String(), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=True),

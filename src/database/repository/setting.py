@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from src.database.schemas.setting import SettingCreate
+from src.database.schemas.setting_schema import SettingCreate
 from src.database.models.setting import Setting
 
 
