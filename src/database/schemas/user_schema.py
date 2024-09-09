@@ -1,9 +1,12 @@
 from pydantic import BaseModel, EmailStr, Field
 
 
-class UserCreate(BaseModel):
+class UserLogin(BaseModel):
     email: EmailStr
     password: str = Field(..., min_length=8)
+
+
+class UserCreate(UserLogin):
     first_name: str
     last_name: str
     company_name: str = None

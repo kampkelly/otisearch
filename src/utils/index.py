@@ -1,5 +1,6 @@
 import secrets
 import string
+import hashlib
 
 
 def generate_secret_key(length=20):
@@ -20,3 +21,8 @@ def generate_index_name(base, table):
 
     new_name = f"{base}_{table}_{random_part}_index"
     return new_name
+
+
+def hash_password(password: str):
+    return hashlib.sha256(password.encode()).hexdigest()
+

@@ -270,6 +270,8 @@ pydantic-core==2.20.1
     # via pydantic
 pygments==2.18.0
     # via rich
+pyjwt==2.9.0
+    # via -r requirements.in
 pypdf==4.2.0
     # via llama-index-readers-file
 python-dateutil==2.9.0.post0

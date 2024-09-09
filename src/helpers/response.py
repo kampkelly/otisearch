@@ -14,3 +14,12 @@ def error_response(message: str, status_code: int = 400):
 class UserResponse(BaseModel):
     status: str
     data: ShowUser
+
+
+class LoginData(BaseModel):
+    token: str
+
+
+class LoginResponse(BaseModel):
+    status: str
+    data: LoginData
