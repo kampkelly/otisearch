@@ -4,13 +4,14 @@ from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from datetime import datetime, timedelta
 from src.database import settings_config
+from uuid import UUID
 
 security = HTTPBearer()
 
 
-def get_token(user_id: str):
+def get_token(user_id: UUID):
     token = jwt.encode({
-              'sub': user_id,
+              'sub': str(user_id),
               'exp': datetime.now() + timedelta(minutes=30)
           }, settings_config.SECRET_KEY, algorithm='HS256')
 

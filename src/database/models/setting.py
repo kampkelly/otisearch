@@ -5,9 +5,6 @@ from src.database.base_class import Base
 
 
 class Setting(Base):
-    id = Column(Integer, primary_key=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     email = Column(String, nullable=False)
     secret_key = Column(String, nullable=False)
     db_user = Column(String, nullable=True)

@@ -4,6 +4,7 @@ from src.database.repository.user import UserRepository
 import src.helpers.response as response
 from src.utils.index import hash_password
 from src.utils.auth import get_token
+from uuid import UUID
 
 
 class User:
@@ -30,7 +31,7 @@ class User:
         return response.success_response({'token': token, "kj": "ok"})
 
     @staticmethod
-    def complete_info(user_id: str, info: CompleteInfo, db: Session):
+    def complete_info(user_id: UUID, info: CompleteInfo, db: Session):
         existing_user = UserRepository.get_user_by_id(user_id, db)
         if not existing_user:
             return response.error_response('user not found', 404)

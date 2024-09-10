@@ -21,7 +21,7 @@ class UserRepository:
         return user
 
     @staticmethod
-    def get_user_by_id(id: int, db: Session):
+    def get_user_by_id(id: str, db: Session):
         user = db.query(User).filter(User.id == id).first()
         return user
 
