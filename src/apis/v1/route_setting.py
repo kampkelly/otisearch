@@ -9,7 +9,7 @@ from src.database.session import get_db
 from src.utils import create_schema_json
 from src.helpers.response import success_response
 
-import src.apis.settings as settings
+import src.apis.settings_service as settings_service
 
 router = APIRouter()
 
@@ -22,13 +22,13 @@ class SchemaInput(BaseModel):
 
 @router.post("/", response_model=ShowSetting, status_code=status.HTTP_201_CREATED)
 def create_setting(setting: SettingCreate, db: Session = Depends(get_db)):
-    setting = settings.create_new_setting(setting=setting, db=db)
+    setting = settings_service.create_new_setting(setting=setting, db=db)
     return setting
 
 
 @router.get("/index-status")
 def get_index_status(index: Union[str, None] = None, email: Union[str, None] = None, db: Session = Depends(get_db)):
-    result = settings.get_index_status(email=email, db=db)
+    result = settings_service.get_index_status(email=email, db=db)
     return result
 
 

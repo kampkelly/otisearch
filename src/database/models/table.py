@@ -1,5 +1,4 @@
-from sqlalchemy import ARRAY, Column, Integer, String, DateTime, ForeignKey
-from sqlalchemy.sql import func
+from sqlalchemy import ARRAY, Column, String, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from src.database.base_class import Base
 

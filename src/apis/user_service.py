@@ -1,25 +1,26 @@
-from sqlalchemy.orm import Session
+from fastapi import Depends
 from src.database.schemas.user_schema import UserCreate, CompleteInfo
-from src.database.repository.user import UserRepository
+from src.database.repository import UserRepository
 import src.helpers.response as response
 from src.utils.index import hash_password
 from src.utils.auth import get_token
 from uuid import UUID
 
 
-class User:
-    @staticmethod
-    def create_user_account(user: UserCreate, db: Session):
-        existing_user = UserRepository.get_user_by_email(user.email, db)
+class UserService:
+    def __init__(self, user_repository: UserRepository = Depends(UserRepository)):
+        self.user_repository = user_repository
+
+    def create_user_account(self, user: UserCreate):
+        existing_user = self.user_repository.get_user_by_email(user.email)
         if existing_user:
             return response.error_response('email already exists', 403)
 
-        new_user = UserRepository.create_new_user(user, db)
+        new_user = self.user_repository.create_new_user(user)
         return response.success_response(new_user)
 
-    @staticmethod
-    def login_user(user: UserCreate, db: Session):
-        existing_user = UserRepository.get_user_by_email(user.email, db)
+    def login_user(self, user: UserCreate):
+        existing_user = self.user_repository.get_user_by_email(user.email)
         if not existing_user:
             return response.error_response('email or password incorrect', 401)
 
@@ -30,11 +31,10 @@ class User:
 
         return response.success_response({'token': token, "kj": "ok"})
 
-    @staticmethod
-    def complete_info(user_id: UUID, info: CompleteInfo, db: Session):
-        existing_user = UserRepository.get_user_by_id(user_id, db)
+    def complete_info(self, user_id: UUID, info: CompleteInfo):
+        existing_user = self.user_repository.get_user_by_id(user_id)
         if not existing_user:
             return response.error_response('user not found', 404)
 
-        updated_user = UserRepository.update_user(user_id, info, db)
+        updated_user = self.user_repository.update_user(user_id, info)
         return response.success_response(updated_user)

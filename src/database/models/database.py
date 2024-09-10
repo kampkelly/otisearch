@@ -7,3 +7,4 @@ class Database(Base):
     postgres_url = Column(String, nullable=False)
     database_name = Column(String, nullable=False)
     datasync_id = Column(UUID(as_uuid=True), ForeignKey('datasync.id'), nullable=True)
+    user_id = Column(UUID(as_uuid=True), ForeignKey('user.id'), nullable=True)

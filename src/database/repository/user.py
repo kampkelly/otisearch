@@ -1,13 +1,17 @@
 from typing import Any
+from fastapi import Depends
 from sqlalchemy.orm import Session
 from src.database.schemas.user_schema import UserCreate
 from src.database.models.user import User
 from src.utils.index import hash_password
+from src.database.session import get_db
 
 
 class UserRepository:
-    @staticmethod
-    def create_new_user(user: UserCreate, db: Session):
+    def __init__(self, db: Session = Depends(get_db)):
+        self.db = db
+
+    def create_new_user(self, user: UserCreate):
         user = User(
             email=user.email,
             first_name=user.first_name,
@@ -15,28 +19,25 @@ class UserRepository:
             company_name=user.company_name,
             password=hash_password(user.password),
         )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
+        self.db.add(user)
+        self.db.commit()
+        self.db.refresh(user)
         return user
 
-    @staticmethod
-    def get_user_by_id(id: str, db: Session):
-        user = db.query(User).filter(User.id == id).first()
+    def get_user_by_id(self, id: str):
+        user = self.db.query(User).filter(User.id == id).first()
         return user
 
-    @staticmethod
-    def get_user_by_email(email: str, db: Session):
-        user = db.query(User).filter(User.email == email).first()
+    def get_user_by_email(self, email: str):
+        user = self.db.query(User).filter(User.email == email).first()
         return user
 
-    @staticmethod
-    def update_user(id: str, data: Any, db: Session):
-        existing_user = UserRepository.get_user_by_id(id, db)
+    def update_user(self, id: str, data: Any):
+        existing_user = self.get_user_by_id(id)
         if not existing_user:
             return None
         for key, value in data.dict().items():
             setattr(existing_user, key, value)
-        db.commit()
-        db.refresh(existing_user)
+        self.db.commit()
+        self.db.refresh(existing_user)
         return existing_user

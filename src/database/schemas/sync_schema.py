@@ -7,6 +7,3 @@ class AddDatabase(BaseModel):
     postgres_url: str
     name: str
     tables: List[str] = []
-
-    class Config:
-        orm_mode = True
