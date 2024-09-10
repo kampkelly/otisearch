@@ -12,6 +12,13 @@ class UserCreate(UserLogin):
     company_name: str = None
 
 
+class CompleteInfo(BaseModel):
+    purpose: str
+
+    class Config:
+        orm_mode = True
+
+
 class ShowUser(BaseModel):
     email: EmailStr
     first_name: str
