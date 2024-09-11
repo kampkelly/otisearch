@@ -1,9 +1,10 @@
-from pydantic import BaseModel
-from typing import List
+from pydantic import BaseModel, UUID4
+from typing import List, Optional
 
 
 class AddDatabase(BaseModel):
-    database_id: str = None
+    database_id: Optional[UUID4] = None
     postgres_url: str
-    name: str
-    tables: List[str] = []
+    database_name: str
+    table: str
+    columns: List[str] = []

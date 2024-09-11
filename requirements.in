@@ -22,3 +22,4 @@ llama-index-vector-stores-elasticsearch
 llama_index.llms.ollama
 llama-index-embeddings-voyageai
 pyjwt
+asyncpg

@@ -25,7 +25,11 @@ anyio==4.4.0
     #   starlette
     #   watchfiles
 async-timeout==4.0.3
-    # via aiohttp
+    # via
+    #   aiohttp
+    #   asyncpg
+asyncpg==0.29.0
+    # via -r requirements.in
 attrs==23.2.0
     # via aiohttp
 bcrypt==4.1.3
