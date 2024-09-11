@@ -11,6 +11,28 @@ class SyncService:
         self.user_repository = user_repository
         self.database_repository = database_repository
 
+    def compare_relationships(self, relationships, compare):
+        error_messages = []
+        for relationship in relationships:
+            found = False
+            for item in compare:
+                if item["foreign_table"] == relationship["name"]:
+                    found = True
+                    if relationship["type"] and item.get("type"):
+                        if relationship["type"] != item["type"]:
+                            error_messages.append(f"Type mismatch for {relationship['name']}: {relationship['type']} != {item['type']}")
+                    compare_columns = [col["name"] for col in item["columns"]]
+                    missing_columns = [col for col in relationship["columns"] if col not in compare_columns]
+
+                    if missing_columns:
+                        error_messages.append(f"Missing columns in {relationship['name']}: {missing_columns}")
+
+            if not found:
+                error_messages.append(f"No matching foreign_table found for {relationship['name']}.")
+
+        if error_messages:
+            raise ValueError("\n".join(error_messages))
+
     async def add_database(self, user_id: str, data: AddDatabase):
         existing_user = self.user_repository.get_user_by_id(user_id)
         if not existing_user:
@@ -32,28 +54,31 @@ class SyncService:
             if existing_table:
                 return response.error_response("Table has already been added", 403)
         db_conn = SyncDatabaseConnection(postgres_url)
-        tables_list = await db_conn.get_tables()
-        found_table = data.table if data.table in tables_list else None
+        tables_list = await db_conn.get_schema_info()
+        found_table = tables_list.get(data.table, None)
 
         if not found_table:
             return response.error_response('Table not found in database', 404)
-        columns = await db_conn.get_columns(data.table)
+        columns = found_table["columns"]
 
         if data.columns:
-            if not all(col in columns for col in data.columns):
+            if not all(col in [c['name'] for c in columns] for col in data.columns):
                 return response.error_response("One or more specified columns do not exist in the table", 404)
             columns = data.columns
 
         new_database = existing_database
+
+        self.compare_relationships(data.relationships, found_table["relationships"])
         if not existing_database:
             new_database = self.database_repository.create_new_database(data, user_id)
         table_data = {
             "table_name": data.table,
             "columns": columns,
-            "es_index": "random"
+            "es_index": "random",
+            "relationships": data.relationships
         }
         new_table = self.database_repository.create_new_table(table_data, new_database.id)
-        
+
         database_with_new_table = self.database_repository.get_database_with_table(new_database.id, new_table.id, user_id)
         return response.success_response(database_with_new_table)
 

@@ -37,10 +37,14 @@ class DatabaseRepository:
         return database
 
     def create_new_table(self, tableData: Table, database_id: str):
+        rel = [rel.to_dict() for rel in tableData["relationships"]]
+
         table = Table(
             table_name=tableData["table_name"],
             columns=tableData["columns"],
             es_index=tableData["es_index"],
+            # relationships=tableData["relationships"],
+            relationships=rel,
             database_id=database_id
         )
         self.db.add(table)
