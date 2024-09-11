@@ -24,7 +24,7 @@ class SyncDatabaseConnection:
             print('Connection Succeded!')
         except Exception as error:
             raise error
- 
+
     async def close(self):
         '''
         Closes the connection pool

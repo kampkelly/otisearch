@@ -24,3 +24,12 @@ async def get_database_info(postgres_url: str, table: str, sync_service: SyncSer
         return resp
     except Exception as e:
         return response.error_response(f"{e}")
+
+
+@router.get("/databases", status_code=status.HTTP_200_OK)
+async def get_databases(sync_service: SyncService = Depends(SyncService), user_id: str = Depends(verify_token)):
+    try:
+        resp = await sync_service.get_databases(user_id)
+        return resp
+    except Exception as e:
+        return response.error_response(f"{e}")

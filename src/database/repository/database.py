@@ -80,3 +80,11 @@ class DatabaseRepository:
         ).first()
 
         return database
+
+    def get_databases(self, user_id: str):
+        databases = self.db.query(Database).options(
+            joinedload(Database.tables)
+        ).filter(
+            Database.user_id == user_id
+        ).all()
+        return databases

@@ -5,6 +5,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from datetime import datetime, timedelta
 from src.database import settings_config
 from uuid import UUID
+from src.database.repository import UserRepository
 
 security = HTTPBearer()
 
@@ -18,11 +19,14 @@ def get_token(user_id: UUID):
     return token
 
 
-async def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
+async def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security),  user_repository: UserRepository = Depends(UserRepository)):
     try:
         payload = jwt.decode(credentials.credentials, settings_config.SECRET_KEY, algorithms=["HS256"])
         user_id = payload.get("sub")
         if user_id is None:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        user = user_repository.get_user_by_id(user_id)
+        if not user:
             raise HTTPException(status_code=401, detail="Invalid token")
         return user_id
     except PyJWTError as e:

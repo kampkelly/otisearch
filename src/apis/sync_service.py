@@ -64,3 +64,7 @@ class SyncService:
         if not selected_table:
             return response.error_response("Table not found", 404)
         return response.success_response({table: selected_table})
+
+    async def get_databases(self, user_id: str):
+        databases = self.database_repository.get_databases(user_id)
+        return response.success_response({"databases": databases})
