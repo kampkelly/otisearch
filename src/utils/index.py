@@ -1,6 +1,7 @@
 import secrets
 import string
 import hashlib
+from urllib.parse import urlparse
 
 
 def generate_secret_key(length=20):
@@ -26,3 +27,28 @@ def generate_index_name(base, table):
 def hash_password(password: str):
     return hashlib.sha256(password.encode()).hexdigest()
 
+
+def parse_postgres_url(url: str) -> dict:
+    """
+    Parse a PostgreSQL URL and extract specific components.
+
+    :param url: PostgreSQL URL string
+    :return: Dictionary containing extracted components
+    """
+    parsed = urlparse(url)
+
+    # Extract components
+    username = parsed.username or ""
+    password = parsed.password or ""
+    hostname = parsed.hostname or ""
+    port = str(parsed.port) if parsed.port else ""
+
+    # Construct the result dictionary
+    result = {
+        "PG_USER": username,
+        "PG_HOST": hostname,
+        "PG_PORT": port,
+        "PG_PASSWORD": password
+    }
+
+    return result

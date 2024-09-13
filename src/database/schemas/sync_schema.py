@@ -49,3 +49,7 @@ class AddDatabase(BaseModel):
     model_config = {
         'arbitrary_types_allowed': True
     }
+
+
+class TriggerSync(BaseModel):
+    datasync_id: str

@@ -28,6 +28,7 @@ async-timeout==4.0.3
     # via
     #   aiohttp
     #   asyncpg
+    #   redis
 asyncpg==0.29.0
     # via -r requirements.in
 attrs==23.2.0
@@ -102,6 +103,8 @@ h11==0.14.0
     # via
     #   httpcore
     #   uvicorn
+hiredis==3.0.0
+    # via redis
 httpcore==1.0.5
     # via httpx
 httptools==0.6.1
@@ -294,6 +297,8 @@ pyyaml==6.0.1
     #   llama-index-core
     #   transformers
     #   uvicorn
+redis[hiredis]==5.0.8
+    # via -r requirements.in
 regex==2024.5.15
     # via
     #   nltk

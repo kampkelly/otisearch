@@ -1,15 +1,22 @@
+import os
+from dotenv import load_dotenv
 from fastapi import Depends
-from src.database.schemas.sync_schema import AddDatabase
-from src.database.repository import DatabaseRepository
-from src.database.repository import UserRepository
+from src.database.schemas.sync_schema import AddDatabase, TriggerSync
+from src.database.repository import DatabaseRepository, DataSyncRepository, UserRepository
 import src.helpers.response as response
 from src.apis.sync_database_service import SyncDatabaseConnection
+from src.utils.create_schema_json import create_json_file
+from pgsync.index import PGSync
+from src.utils.index import parse_postgres_url
+
+load_dotenv()
 
 
 class SyncService:
-    def __init__(self, user_repository: UserRepository = Depends(UserRepository), database_repository: DatabaseRepository = Depends(DatabaseRepository)):
+    def __init__(self, user_repository: UserRepository = Depends(UserRepository), database_repository: DatabaseRepository = Depends(DatabaseRepository), datasync_repository: DataSyncRepository = Depends(DataSyncRepository)):
         self.user_repository = user_repository
         self.database_repository = database_repository
+        self.datasync_repository = datasync_repository
 
     def compare_relationships(self, relationships, compare):
         error_messages = []
@@ -74,10 +81,15 @@ class SyncService:
         table_data = {
             "table_name": data.table,
             "columns": columns,
-            "es_index": "random",
             "relationships": data.relationships
         }
-        new_table = self.database_repository.create_new_table(table_data, new_database.id)
+        # create datasync
+        new_datasync = self.datasync_repository.create_new_datasync({
+            "es_index": "tan",
+            "is_active": False
+        },
+            user_id)
+        new_table = self.database_repository.create_new_table(table_data, new_database.id, new_datasync.id)
 
         database_with_new_table = self.database_repository.get_database_with_table(new_database.id, new_table.id, user_id)
         return response.success_response(database_with_new_table)
@@ -93,3 +105,33 @@ class SyncService:
     async def get_databases(self, user_id: str):
         databases = self.database_repository.get_databases(user_id)
         return response.success_response({"databases": databases})
+
+    async def trigger_sync(self, data: TriggerSync, user_id: str):
+        datasync = self.datasync_repository.get_datasync_by_id(data.datasync_id, user_id)
+
+        _, file_path = create_json_file(
+            database=datasync.tables[0].database.database_name,
+            table=datasync.tables[0].table_name,
+            es_index=datasync.es_index,
+            columns=datasync.tables[0].columns,
+            relationships=datasync.tables[0].relationships
+        )
+
+        parsed_postgres_url = parse_postgres_url(datasync.tables[0].database.postgres_url)
+
+        pgsync_envs = {
+            "PG_USER": parsed_postgres_url["PG_USER"],
+            "PG_HOST": parsed_postgres_url["PG_HOST"],
+            "PG_PORT": parsed_postgres_url["PG_PORT"],
+            "PG_PASSWORD": parsed_postgres_url["PG_PASSWORD"],
+            "PG_SSLMODE": "",
+            "ELASTICSEARCH_CLOUD_ID": os.getenv('ELASTICSEARCH_CLOUD_ID', ""),
+            "ELASTICSEARCH_API_KEY": os.getenv('ELASTICSEARCH_API_KEY', ""),
+            "ELASTICSEARCH_PORT": os.getenv('ELASTICSEARCH_PORT', ""),
+        }
+
+        pgsync = PGSync(pgsync_envs, file_path, datasync.es_index)
+        pgsync.start_sync()
+        pgsync.list_processes("running")
+
+        return response.success_response(datasync)

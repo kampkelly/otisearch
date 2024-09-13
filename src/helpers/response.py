@@ -42,18 +42,17 @@ class CompleteInfoResponse(BaseModel):
 
 
 class TableInfo(BaseModel):
-    es_index: str
     database_id: UUID
     columns: List[str]
     created_at: datetime
     table_name: str
     id: UUID
     updated_at: Optional[datetime] = None
+    datasync_id: Optional[UUID] = None
 
 
 class DatabaseInfo(BaseModel):
     id: UUID
-    datasync_id: Optional[UUID] = None
     postgres_url: str
     updated_at: Optional[datetime] = None
     user_id: UUID

@@ -23,3 +23,4 @@ llama_index.llms.ollama
 llama-index-embeddings-voyageai
 pyjwt
 asyncpg
+redis[hiredis]
