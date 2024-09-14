@@ -1,15 +1,22 @@
 import json
 
+foreign_key_suffix = "C7PvAmtr8"
+
 
 def populate_children(relationships):
     children = []
     for item in relationships:
         new_child = {
             "table": item["name"],
+            "label": f"{item['foreign_key']}_{foreign_key_suffix}",
             "columns": item["columns"],
             "relationship": {
                 "variant": "object",
-                "type": item["type"].replace("-", "_")
+                "type": item["type"].replace("-", "_"),
+                "foreign_key": {
+                    "child": ["id"],
+                    "parent": [item["foreign_key"]]
+                }
             }
         }
         children.append(new_child)

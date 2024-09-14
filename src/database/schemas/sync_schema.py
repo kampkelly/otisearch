@@ -4,6 +4,7 @@ from typing import List, Optional, Dict, Any, Union
 
 class Relationship(BaseModel):
     name: str
+    foreign_key: str
     type: str
     columns: List[str]
 

@@ -40,7 +40,7 @@ class PGSync:
             if run_mode:
                 # add stdout=subprocess.PIPE, stderr=subprocess.PIPE
                 return subprocess.run(bash_command, shell=True, env=self.env, executable='/bin/bash', timeout=10)
-            return subprocess.Popen(bash_command, shell=True, env=self.env, executable='/bin/bash')
+            return subprocess.Popen(bash_command, shell=True, env=self.env, executable='/bin/bash',)
         except subprocess.TimeoutExpired:
             print("Command timed out.")
         except Exception as e:
@@ -62,7 +62,6 @@ class PGSync:
 
         if os.path.exists(self.config_path):
             threading.Timer(20, os.remove, [self.config_path]).start()
-
         print(f"Started {self.es_index} with PID: {process.pid}")
 
     def stop(self, client_name: str):

@@ -42,3 +42,12 @@ async def trigger_sync(data: TriggerSync, sync_service: SyncService = Depends(Sy
         return resp
     except Exception as e:
         return response.error_response(f"{e}")
+
+
+@router.post("/status", status_code=status.HTTP_200_OK)
+async def sync_status(data: TriggerSync, sync_service: SyncService = Depends(SyncService), user_id: str = Depends(verify_token)):
+    try:
+        resp = await sync_service.sync_status(data, user_id)
+        return resp
+    except Exception as e:
+        return response.error_response(f"{e}")

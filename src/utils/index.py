@@ -1,6 +1,7 @@
+import uuid
 import secrets
-import string
 import hashlib
+from datetime import datetime
 from urllib.parse import urlparse
 
 
@@ -13,14 +14,11 @@ def generate_secret_key(length=20):
     return secret_key
 
 
-def generate_index_name(base, table):
-    characters = string.ascii_lowercase
+def generate_index_name(db_name, table_name):
+    unique_suffix = uuid.uuid4().hex[:8]
+    timestamp = datetime.now().strftime("%Y%m%d%H%M%S")
 
-    # Generate a random string of 5 characters from the defined set
-    # We use 5 because one character is reserved for the underscore prefix
-    random_part = ''.join(secrets.choice(characters) for i in range(5))
-
-    new_name = f"{base}_{table}_{random_part}_index"
+    new_name = f"{db_name}_{table_name}_{unique_suffix}_{timestamp}"
     return new_name
 
 

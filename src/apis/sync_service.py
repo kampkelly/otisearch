@@ -7,7 +7,8 @@ import src.helpers.response as response
 from src.apis.sync_database_service import SyncDatabaseConnection
 from src.utils.create_schema_json import create_json_file
 from pgsync.index import PGSync
-from src.utils.index import parse_postgres_url
+from src.utils.index import parse_postgres_url, generate_index_name
+from src.lib.esearch.query import ESearchQuery
 
 load_dotenv()
 
@@ -23,7 +24,7 @@ class SyncService:
         for relationship in relationships:
             found = False
             for item in compare:
-                if item["foreign_table"] == relationship["name"]:
+                if item["column"] == relationship["foreign_key"]:
                     found = True
                     if relationship["type"] and item.get("type"):
                         if relationship["type"] != item["type"]:
@@ -65,7 +66,7 @@ class SyncService:
         found_table = tables_list.get(data.table, None)
 
         if not found_table:
-            return response.error_response('Table not found in database', 404)
+            return response.error_response(f'Table "{data.table}" not found in database', 404)
         columns = found_table["columns"]
 
         if data.columns:
@@ -85,7 +86,7 @@ class SyncService:
         }
         # create datasync
         new_datasync = self.datasync_repository.create_new_datasync({
-            "es_index": "tan",
+            "es_index": generate_index_name(data.database_name, data.table),
             "is_active": False
         },
             user_id)
@@ -135,3 +136,23 @@ class SyncService:
         pgsync.list_processes("running")
 
         return response.success_response(datasync)
+
+    async def sync_status(self, data: TriggerSync, user_id: str):
+        datasync = self.datasync_repository.get_datasync_by_id(data.datasync_id, user_id)
+
+        db_conn = SyncDatabaseConnection(datasync.tables[0].database.postgres_url)
+        table_row_count = await db_conn.get_table_row_count(datasync.tables[0].table_name)
+
+        esearch = ESearchQuery()
+        index_count, is_success = esearch.get_index_row_count(datasync.es_index)
+
+        percent_completed = int((index_count / table_row_count * 100)) if table_row_count > 0 else 0
+
+        resp = {
+            "table_row_count": table_row_count,
+            "es_index_count": index_count,
+            "is_success": is_success,
+            "percent": percent_completed,
+        }
+
+        return response.success_response(resp)

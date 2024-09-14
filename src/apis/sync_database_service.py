@@ -178,3 +178,19 @@ class SyncDatabaseConnection:
                 })
 
         return schema_info
+
+    async def get_table_row_count(self, table_name: str):
+        '''
+        Returns the number of rows in a specific table
+        '''
+        await self.setup()
+        if not self.pool:
+            raise Exception("Database connection not initialized. Call setup() first.")
+
+        async with self.pool.acquire() as connection:
+            query = f"""
+            SELECT COUNT(*)
+            FROM "{table_name}"
+            """
+            row_count = await connection.fetchval(query)
+            return row_count
