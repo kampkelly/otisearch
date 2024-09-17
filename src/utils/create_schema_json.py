@@ -29,7 +29,7 @@ def create_json(database, table, es_index, columns, relationships):
         "index": es_index,
         "plugins": ["Vector"],
         "mapping": {
-            "description_vector": {
+            "search_vectors": {
                 "type": "dense_vector",
                 "dims": 1024,
                 "index": "true",

@@ -12,6 +12,7 @@ class Table(Base):
     database = relationship("Database", back_populates="tables")
     datasync = relationship("DataSync", back_populates="tables")
     relationships = Column(JSON, nullable=True)
+    es_columns = Column(JSON, nullable=True)
 
     def __repr__(self):
-        return f"<Table(id={self.id}, table_name={self.table_name}, columns={self.columns}, relationships={self.relationships}, database_id={self.database_id})>"
+        return f"<Table(id={self.id}, table_name={self.table_name}, columns={self.columns}, relationships={self.relationships}, database_id={self.database_id}, es_columns={self.es_columns})>"

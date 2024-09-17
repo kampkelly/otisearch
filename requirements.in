@@ -24,3 +24,5 @@ llama-index-embeddings-voyageai
 pyjwt
 asyncpg
 redis[hiredis]
+langchain
+langchain-openai

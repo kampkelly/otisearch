@@ -35,8 +35,13 @@ install:
 	pip-compile requirements.in && pip-sync requirements.txt
 
 start-app:
-	@echo "Starting app..."
+ifdef PORT
+	@echo "Starting app on port ${PORT}..."
+	uvicorn main:app --reload --port ${PORT}
+else
+	@echo "Starting app on port 8000..."
 	uvicorn main:app --reload
+endif
 
 # Help command to display available commands
 help:

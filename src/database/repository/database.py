@@ -51,6 +51,17 @@ class DatabaseRepository:
         self.db.refresh(table)
         return table
 
+    def update_table(self, table_id: str, tableData: dict):
+        table = self.db.query(Table).filter(Table.id == table_id).first()
+        if table:
+            for key, value in tableData.items():
+                if hasattr(table, key):
+                    setattr(table, key, value)
+            self.db.commit()
+            self.db.refresh(table)
+            return table
+        return None
+
     def get_tables_by_database_id(self, database_id: str) -> List[Table]:
         tables = self.db.query(Table).filter(Table.database_id == database_id).all()
         return tables
