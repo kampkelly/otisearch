@@ -1,5 +1,6 @@
 from enum import Enum
 from abc import ABC, abstractmethod
+from langchain_core.prompts import ChatPromptTemplate
 
 
 class LLMType(Enum):
@@ -34,3 +35,9 @@ class LLMBase(ABC):
         Validates the generated query
         '''
         return True, ""
+
+    def get_llm_chain(self, prompt: ChatPromptTemplate = None):
+        '''
+        '''
+        chain = (prompt or self.prompt) | self.llm
+        return chain

@@ -17,7 +17,6 @@ class OpenAILLM(LLMBase):
         Initializes the OpenAI class
         '''
         self.api_key = os.getenv('OPENAI_API_KEY', "")
-        self.model = None
         self.prompt = ""
         self.llm = None
 
@@ -61,7 +60,7 @@ class OpenAILLM(LLMBase):
         '''
         Gets the SQL query based on the question and schemas
         '''
-        chain = self.prompt | self.llm
+        chain = self.get_llm_chain()
         result = chain.invoke(
             {
                 "query": query,

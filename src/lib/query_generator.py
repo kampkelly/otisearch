@@ -1,8 +1,21 @@
 import json
-from typing import List
+from dotenv import load_dotenv
+from typing import List, Any
 from src.lib.base import LLMType
 from src.lib.openai.openai import OpenAILLM
-from python_modules.embedding_model import get_embeddings
+from python_modules.embedding_model import get_embeddings, get_embed_model
+from langchain_core.prompts import ChatPromptTemplate
+from langchain.memory import ConversationBufferMemory
+from langchain.chains import create_retrieval_chain
+from langchain.agents import (
+    Tool,
+    AgentExecutor,
+    create_react_agent
+)
+from src.lib.esearch.custom import CustomElasticsearchRetriever
+from src.lib.esearch.query import ESearchQuery
+
+load_dotenv
 
 
 class QueryGeneratorFactory:
@@ -62,3 +75,89 @@ class QueryGenerator:
         query = self.llm.generate_query(query, json.dumps(columns), json.dumps(related_columns))
         query_with_vector = self.embed_query_vector(query)
         return query_with_vector
+
+    def get_prompt(self, msg: str = None):
+        '''
+
+        '''
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                (
+                    "system",
+                    """You are a helpful assitant assiting users to find information from database data. The users query may contain little mistakes and spelling mistakes,
+                    so if you see any similar information, report it and explain the similarity.
+                    You have access to the following tools {tool_names} to use to assist in searching the database:\n\n
+                    {tools}\n\n
+
+                    Use the following format:\n\n
+
+                    Question: the input query you must answer\n
+                    Thought: You should always think about what to do, always use the Query_database at least once.\n
+                    Action: the action to take, it can only be one of [{tool_names}]\n
+                    Action Input: the input to the action\n
+                    Observation: the result of the action\n
+                    ... (this Thought/Action/Action Input/Observation can repeat not more than N times)\n\n
+
+                    When you have a final response from database only, you MUST use the format:\n
+                    Thought: I now know the final answer to the original query and I dont need to use a tool? Yes\n
+                    Final Answer: [your response here]\n
+                    Begin
+                    """
+                ),
+                ("human", "{input}"),
+                ("human", "{agent_scratchpad}"),
+            ]
+        )
+
+        return prompt
+
+    def retrieve_insights(self, query: str, es_index_name: str, columns: Any, related_columns: Any):
+        '''
+
+        '''
+        esearch = ESearchQuery()
+        es_client = esearch.esearch_client
+        custom_retriever = CustomElasticsearchRetriever(index_name=es_index_name, esearch_client=es_client, columns=columns,
+                                                        related_columns=related_columns, generate_query=self.generate_query)
+
+        prompt = self.get_prompt()
+        llm_chain = self.llm.get_llm_chain(prompt)
+        # use llama here or another open source model good for reasoning tasks for llm_chain.
+        # but custom_retriever should use best model for code generation
+        rag_chain = create_retrieval_chain(custom_retriever, llm_chain)
+        tools = [
+            Tool(
+                name="Query_database",
+                func=lambda x, **kwargs: rag_chain.invoke({
+                    "input": x,
+                    "tool_names": kwargs.get("tools", ""),
+                    "tools": kwargs.get("tool_names", ""),
+                    "agent_scratchpad": kwargs.get("agent_scratchpad", ""),
+                }),
+                description="Use for querying. This is a retrieval tool used to answer users search request. It takes as input a string for what the user is searching for."
+            )
+        ]
+        memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True, input_key="input")
+
+        # you can use llama here or another open source model good for reasoning tasks
+        agent = create_react_agent(self.llm.llm, tools, prompt)
+        agent_executor = AgentExecutor(
+            agent=agent, tools=tools,
+            verbose=True,
+            memory=memory,
+            return_intermediate_steps=True,
+            handle_parsing_errors=True,
+            max_iterations=4
+        )
+
+        tool_names = [tool.name for tool in tools]
+        tool_descriptions = "\n".join([f"{tool.name}: {tool.description}" for tool in tools])
+
+        result = agent_executor.invoke({
+            "input": query,
+            "tool_names": ", ".join(tool_names),
+            "tools": tool_descriptions,
+            "agent_scratchpad": []
+        })
+
+        return result["output"]

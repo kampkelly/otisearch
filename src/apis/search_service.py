@@ -15,7 +15,6 @@ class SearchService:
         self.user_repository = user_repository
         self.database_repository = database_repository
         self.datasync_repository = datasync_repository
-        # self.sql_generator = QueryGenerator(llm_type, **kwargs)
         self.sql_generator = QueryGenerator(LLMType.OPENAI)
         self.sql_generator.setup()
 
@@ -40,3 +39,13 @@ class SearchService:
         res = esearch.semantic_Search(index_name, combined_query)
 
         return {'response': res}
+
+    def insights_search(self, data: SemanticSearch, user_id: str):
+        datasync = self.datasync_repository.get_datasync_by_id(data.datasync_id, user_id)
+        all_columns = datasync.tables[0].es_columns
+        columns = all_columns.get("columns", [])
+        related_columns = all_columns.get("relationships", [])
+
+        query_response = self.sql_generator.retrieve_insights(data.query, datasync.es_index, columns, related_columns)
+
+        return response.success_response({"data": {"response": query_response}})

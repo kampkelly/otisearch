@@ -47,3 +47,12 @@ def semantic_search(data: SemanticSearch, search_service: SearchService = Depend
         return resp
     except Exception as e:
         return response.error_response(f"{e}")
+
+
+@router.post("/insights", status_code=status.HTTP_200_OK)
+def insights_search(data: SemanticSearch, search_service: SearchService = Depends(SearchService), user_id: str = Depends(verify_token)):
+    try:
+        resp = search_service.insights_search(data, user_id)
+        return resp
+    except Exception as e:
+        return response.error_response(f"{e}")

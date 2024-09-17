@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from llama_index.embeddings.voyageai import VoyageEmbedding
+from langchain_voyageai import VoyageAIEmbeddings
 
 load_dotenv()
 
@@ -10,13 +10,14 @@ voyage_api_key = os.getenv('VOYAGE_API_KEY', "")
 
 
 def get_embed_model():
-    embed_model = VoyageEmbedding(
-        model_name=model_name, voyage_api_key=voyage_api_key
+    embed_model = VoyageAIEmbeddings(
+        model=model_name, voyage_api_key=voyage_api_key
     )
     return embed_model
 
 
 def get_embeddings(text):
     embed_model = get_embed_model()
-    embeddings = embed_model.get_query_embedding(text)
+    embeddings = embed_model.embed_query(text)
+
     return embeddings

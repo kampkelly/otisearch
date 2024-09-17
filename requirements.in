@@ -20,9 +20,10 @@ llama-index
 llama-index-embeddings-ollama
 llama-index-vector-stores-elasticsearch
 llama_index.llms.ollama
-llama-index-embeddings-voyageai
 pyjwt
 asyncpg
 redis[hiredis]
 langchain
 langchain-openai
+langchain-elasticsearch
+langchain_voyageai==0.1.1

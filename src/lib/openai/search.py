@@ -8,7 +8,7 @@ from src.database import Setting
 
 load_dotenv()
 
-openai.api_key = os.getenv("OPENAI_KEY")
+openai.api_key = os.getenv("OPENAI_API_KEY")
 set_base = "cl100k_base"
 
 EMBEDDING_MODEL = "text-embedding-3-large"

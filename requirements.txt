@@ -70,9 +70,10 @@ dnspython==2.6.1
     # via email-validator
 elastic-transport==8.13.1
     # via elasticsearch
-elasticsearch==8.14.0
+elasticsearch[vectorstore-mmr]==8.14.0
     # via
     #   -r requirements.in
+    #   langchain-elasticsearch
     #   llama-index-vector-stores-elasticsearch
 elasticsearchquerygenerator==5.0.0
     # via -r requirements.in
@@ -146,12 +147,18 @@ langchain==0.2.16
 langchain-core==0.2.40
     # via
     #   langchain
+    #   langchain-elasticsearch
     #   langchain-openai
     #   langchain-text-splitters
+    #   langchain-voyageai
+langchain-elasticsearch==0.2.2
+    # via -r requirements.in
 langchain-openai==0.1.20
     # via -r requirements.in
 langchain-text-splitters==0.2.4
     # via langchain
+langchain-voyageai==0.1.1
+    # via -r requirements.in
 langsmith==0.1.120
     # via
     #   langchain
@@ -175,7 +182,6 @@ llama-index-core==0.10.52.post1
     #   llama-index-cli
     #   llama-index-embeddings-ollama
     #   llama-index-embeddings-openai
-    #   llama-index-embeddings-voyageai
     #   llama-index-indices-managed-llama-cloud
     #   llama-index-llms-ollama
     #   llama-index-llms-openai
@@ -192,8 +198,6 @@ llama-index-embeddings-openai==0.1.10
     # via
     #   llama-index
     #   llama-index-cli
-llama-index-embeddings-voyageai==0.1.4
-    # via -r requirements.in
 llama-index-indices-managed-llama-cloud==0.2.3
     # via llama-index
 llama-index-legacy==0.9.48
@@ -441,8 +445,8 @@ uvicorn[standard]==0.30.1
     #   fastapi
 uvloop==0.19.0
     # via uvicorn
-voyageai==0.1.7
-    # via llama-index-embeddings-voyageai
+voyageai==0.2.3
+    # via langchain-voyageai
 watchfiles==0.22.0
     # via uvicorn
 websockets==12.0

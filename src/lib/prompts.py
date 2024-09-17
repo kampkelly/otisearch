@@ -4,8 +4,9 @@ def get_messages():
     Then write an elastic search query for it. For the query, use the column names as exactly how it is written in the lists.
     You MUST always also add to the elastic search query a knn search for the dense vector column "search_vectors".
     Use what should be embedded as the value of the query_vector within this quote <> in this format `"query_vector": "<value to embed>"`, (I will embed it myself later).
-    If knn is added, set k = 50 and num_candidates = 500 and the knn query should be in the root object
-    Apply boost to the subquery that is most relevant so it ranks higher
+    If knn is added, set k = 50 and num_candidates = 500 and the knn query should be in the root object.
+    Add rank={{"rrf": {{"rank_window_size": 50}}}} in the root object.
+    Apply boost to the subquery that is most relevant so it ranks higher. Do not use nested queries
     The query MUST not modify any information or return elasticsearch system info.
     """
 
