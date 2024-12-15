@@ -99,13 +99,48 @@ class SyncService:
         db_conn = SyncDatabaseConnection(postgres_url)
         tables_list = await db_conn.get_schema_info()
         selected_table = tables_list.get(table, [])
-        if not selected_table:
-            return response.error_response("Table not found", 404)
-        return response.success_response({table: selected_table})
+
+        tables = []
+        relationships = []
+        for table, objs in tables_list.items():
+            selected_table = objs
+            selected_table["table_name"] = table
+            relationships.extend(selected_table.get("relationships", []))
+            tables.append(selected_table)
+        return response.success_response({"tables": tables})
 
     async def get_databases(self, user_id: str):
         databases = self.database_repository.get_databases(user_id)
         return response.success_response({"databases": databases})
+
+    async def get_database(self, database_id, user_id: str):
+        database = self.database_repository.get_database_by_id(database_id, user_id, True)
+        db_conn = SyncDatabaseConnection(database.postgres_url)
+        tables = []
+        datasyncs = []
+        relationships = []
+        tables_list = await db_conn.get_schema_info()
+        for table in database.tables:
+            datasync_obj = table.datasync
+            datasync_obj.table_name = table.table_name
+            datasyncs.append(table.datasync)
+
+        for table, objs in tables_list.items(): # postgres
+            db_table = next((t for t in database.tables if t.table_name == table), None)
+            selected_table = objs
+            selected_table["table_name"] = table
+            relationships.extend(selected_table.get("relationships", []))
+            if db_table:
+                selected_table['is_added'] = True
+                for col in selected_table.get("columns", []): # postgres
+                    col["is_synced"] = col.get("name", "") in db_table.columns
+            tables.append(selected_table)
+
+        return response.success_response({"database": database, "tables": tables, "relationships": relationships, "datasyncs": datasyncs})
+
+    async def get_datasyncs(self, user_id: str, is_active):
+        datasyncs = self.datasync_repository.get_datasyncs(user_id, is_active)
+        return response.success_response({"datasyncs": datasyncs})
 
     async def trigger_sync(self, data: TriggerSync, user_id: str):
         datasync = self.datasync_repository.get_datasync_by_id(data.datasync_id, user_id)
@@ -126,9 +161,8 @@ class SyncService:
             "PG_PORT": parsed_postgres_url["PG_PORT"],
             "PG_PASSWORD": parsed_postgres_url["PG_PASSWORD"],
             "PG_SSLMODE": "",
-            "ELASTICSEARCH_CLOUD_ID": os.getenv('ELASTICSEARCH_CLOUD_ID', ""),
-            "ELASTICSEARCH_API_KEY": os.getenv('ELASTICSEARCH_API_KEY', ""),
-            "ELASTICSEARCH_PORT": os.getenv('ELASTICSEARCH_PORT', ""),
+            "ELASTICSEARCH_HOST": os.getenv('ELASTICSEARCH_HOST', "localhost"),
+            "ELASTICSEARCH_PORT": os.getenv('ELASTICSEARCH_PORT', 9200),
         }
 
         pgsync = PGSync(pgsync_envs, file_path, datasync.es_index)

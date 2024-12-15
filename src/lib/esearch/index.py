@@ -7,10 +7,10 @@ load_dotenv()
 
 class ESearch():
     def __init__(self):
-        cloud_id = os.getenv('ELASTICSEARCH_CLOUD_ID', "")
-        api_key = os.getenv('ELASTICSEARCH_API_KEY', "")
+        es_host = os.getenv("ELASTICSEARCH_HOST", "localhost")
+        es_port = int(os.getenv("ELASTICSEARCH_PORT", 9200))
+        es_scheme = os.getenv("ELASTICSEARCH_SCHEME", "http")
 
         self.client = Elasticsearch(
-            cloud_id=cloud_id,
-            api_key=api_key
+            hosts=[{'host': es_host, 'port': es_port, 'scheme': es_scheme}]
         )

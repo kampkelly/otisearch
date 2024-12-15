@@ -40,7 +40,7 @@ def create_json(database, table, es_index, columns, relationships):
             "table": table,
             "schema": "public",
             "columns": columns,
-            "children": populate_children(relationships)
+            "children": populate_children(relationships) or []
         }
     }]
 

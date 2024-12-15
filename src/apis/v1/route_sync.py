@@ -34,6 +34,23 @@ async def get_databases(sync_service: SyncService = Depends(SyncService), user_i
     except Exception as e:
         return response.error_response(f"{e}")
 
+@router.get("/database/{database_id}", status_code=status.HTTP_200_OK)
+async def get_database(database_id: str, sync_service: SyncService = Depends(SyncService), user_id: str = Depends(verify_token)):
+    try:
+        resp = await sync_service.get_database(database_id, user_id)
+        return resp
+    except Exception as e:
+        return response.error_response(f"{e}")
+
+
+@router.get("/datasyncs", status_code=status.HTTP_200_OK)
+async def get_datasyncs(is_active: bool = None, sync_service: SyncService = Depends(SyncService), user_id: str = Depends(verify_token)):
+    try:
+        resp = await sync_service.get_datasyncs(user_id, is_active)
+        return resp
+    except Exception as e:
+        return response.error_response(f"{e}")
+
 
 @router.post("/trigger-sync", status_code=status.HTTP_200_OK)
 async def trigger_sync(data: TriggerSync, sync_service: SyncService = Depends(SyncService), user_id: str = Depends(verify_token)):

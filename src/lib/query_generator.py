@@ -64,6 +64,15 @@ class QueryGenerator:
 
             # Replace the query_vector with the embedding
             query_json["knn"]["query_vector"] = embedding
+        elif query_vector:
+            # Extract the text between < and >
+            text_to_embed = query_vector
+
+            # Get the embedding for the extracted text
+            embedding = get_embeddings(text_to_embed)
+
+            # Replace the query_vector with the embedding
+            query_json["knn"]["query_vector"] = embedding
 
         return query_json
 
@@ -85,7 +94,7 @@ class QueryGenerator:
                 (
                     "system",
                     """You are a helpful assitant assiting users to find information from database data. The users query may contain little mistakes and spelling mistakes,
-                    so if you see any similar information, report it and explain the similarity.
+                    so if you see any similar information, report it and explain the similarity. The final answer must come from the database.
                     You have access to the following tools {tool_names} to use to assist in searching the database:\n\n
                     {tools}\n\n
 

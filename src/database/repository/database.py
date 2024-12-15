@@ -11,12 +11,18 @@ class DatabaseRepository:
     def __init__(self, db: Session = Depends(get_db)):
         self.db = db
 
-    def get_database_by_id(self, id: str, user_id: str):
-        database = self.db.query(Database).filter(
+    def get_database_by_id(self, id: str, user_id: str, complex: bool = False):
+        query = self.db.query(Database).filter(
             Database.id == id,
             Database.user_id == user_id
-        ).first()
-        return database
+        )
+
+        if complex:
+            query = query.options(
+                joinedload(Database.tables).joinedload(Table.datasync)
+            )
+
+        return query.first()
 
     def get_database_by_url(self, url: str, user_id: str):
         database = self.db.query(Database).filter(

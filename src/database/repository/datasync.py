@@ -31,3 +31,15 @@ class DataSyncRepository:
         self.db.commit()
         self.db.refresh(datasync)
         return datasync
+
+    def get_datasyncs(self, user_id: str, is_active: bool):
+        query = self.db.query(DataSync).options(
+            joinedload(DataSync.tables).joinedload(Table.database)
+        ).filter(
+            DataSync.user_id == user_id
+        )
+
+        if is_active is not None:
+            query = query.filter(DataSync.is_active == is_active)
+
+        return query.all()
